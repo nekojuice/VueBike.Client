@@ -13,8 +13,9 @@ onMounted(async () => {
 })
 const dataArray = ref([])
 
-// Datatble -------
-// 站點關鍵字
+//--------------------
+// Datatble ----------
+// 站點搜尋關鍵字
 const keywordsSearch = ref('')
 // 資料搜尋-站點關鍵字
 const dataSearched = computed(() =>
@@ -40,7 +41,6 @@ function sortToggle(fieldName) {
     ref_sortToggle.value.order = ref_sortToggle.value.order * -1
   }
 }
-
 // 資料排序-computed()
 const dataSorted = computed(() => {
   if (ref_sortToggle.value.sortField === 'total')
@@ -54,7 +54,8 @@ const dataSorted = computed(() => {
   return dataArray.value
 })
 
-// Pages ----------
+//--------------------
+// Pagination -------------
 // 當前頁面
 const pageCurrent = ref(0)
 // 最大頁面
@@ -76,6 +77,25 @@ function btnPageNext() {
 function btnPageJump(page) {
   pageCurrent.value = page - 1 // page值用於顯示，會多1
 }
+
+// 頁面切換按鈕
+const visiblePages = computed(() => {
+  const pages = []
+  const maxVisible = 10
+  const half = Math.floor(maxVisible / 2) - 1
+
+  let start = Math.max(pageCurrent.value - half, 1)
+  let end = Math.min(start + maxVisible - 1, pageMax.value)
+
+  if (end - start < maxVisible - 1) {
+    start = Math.max(end - maxVisible + 1, 1)
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
 </script>
 
 <template>
@@ -120,7 +140,7 @@ function btnPageJump(page) {
       ><button
         class="btn btn-outline-primary"
         @click="btnPageJump(n)"
-        v-for="n in pageMax"
+        v-for="n in visiblePages"
         v-bind:key="n"
       >
         {{ n }}</button
