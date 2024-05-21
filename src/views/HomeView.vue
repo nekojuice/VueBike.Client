@@ -13,9 +13,9 @@ onMounted(async () => {
 const dataArray = ref([])
 
 // Datatble -------
-// 搜尋站點地址
+// 站點關鍵字
 const keywordsSearch = ref('')
-// 資料搜尋
+// 資料搜尋-站點關鍵字
 const dataSearched = computed(() =>
   keywordsSearch.value === ''
     ? dataArray.value
@@ -23,8 +23,27 @@ const dataSearched = computed(() =>
 )
 // 資料切頁-一次10筆
 const data10x = computed(() =>
-  dataSearched.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
+  dataSort_total.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
 )
+// 資料排序-總車位數量
+const ref_sortToggle_total = ref(null) // 第一次按才給值，true: asc，false: desc
+function sortToggle_total() {
+  if (ref_sortToggle_total.value === null) {
+    ref_sortToggle_total.value = false // 初始為desc
+  } else {
+    ref_sortToggle_total.value = !ref_sortToggle_total.value
+  }
+}
+const dataSort_total = computed(() => {
+  switch (ref_sortToggle_total.value) {
+    case true:
+      return dataSearched.value.sort((a, b) => a.total - b.total)
+    case false:
+      return dataSearched.value.sort((a, b) => b.total - a.total)
+    default:
+      return dataSearched.value
+  }
+})
 
 // Pages ----------
 // 當前頁面
@@ -65,7 +84,7 @@ function btnPageJump(page) {
             <th>站點名稱</th>
             <th>站點所在區域</th>
             <th>站點地址</th>
-            <th>總車位數量</th>
+            <th>總車位數量<button @click="sortToggle_total">S</button></th>
             <th>可租借的腳踏車數量</th>
             <th>站點緯度</th>
             <th>站點經度</th>
