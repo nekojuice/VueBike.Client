@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 
-// 資料
+// 資料  ----------
 onMounted(async () => {
   console.log(`the component is now mounted.`)
   const response = await fetch(
@@ -12,17 +12,25 @@ onMounted(async () => {
 })
 const dataArray = ref([])
 
-// Datatble
-// 過濾顯示資料(換頁)
-const dataFiltered = computed(() =>
-  dataArray.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
+// Datatble -------
+// 搜尋站點地址
+const keywordsSearch = ref('')
+// 資料搜尋
+const dataSearched = computed(() =>
+  keywordsSearch.value === ''
+    ? dataArray.value
+    : dataArray.value.filter((data) => data.ar.includes(keywordsSearch.value))
+)
+// 資料切頁-一次10筆
+const data10x = computed(() =>
+  dataSearched.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
 )
 
-// Pages
+// Pages ----------
 // 當前頁面
 const pageCurrent = ref(0)
 // 最大頁面
-const pageMax = computed(() => Math.ceil(dataArray.value.length / 10))
+const pageMax = computed(() => Math.ceil(dataSearched.value.length / 10))
 
 // 頁面切換
 function btnPagePrev() {
@@ -38,7 +46,7 @@ function btnPageNext() {
   pageCurrent.value++
 }
 function btnPageJump(page) {
-  pageCurrent.value = page - 1 // page用於顯示，多1
+  pageCurrent.value = page - 1 // page值用於顯示，會多1
 }
 </script>
 
@@ -46,8 +54,9 @@ function btnPageJump(page) {
   <main>
     <div class="container">
       <div>
-        <button></button>
-        <input type="text" />
+        <button class="btn btn-primary">查詢</button>
+        &nbsp;
+        <input type="text" class="" v-model="keywordsSearch" />
       </div>
       <table class="table">
         <thead>
@@ -64,7 +73,7 @@ function btnPageJump(page) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="data in dataFiltered" v-bind:key="data.sno">
+          <tr v-for="data in data10x" v-bind:key="data.sno">
             <td>{{ data.sno }}</td>
             <td>{{ data.sna }}</td>
             <td>{{ data.sarea }}</td>
