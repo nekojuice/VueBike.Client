@@ -19,47 +19,39 @@ const keywordsSearch = ref('')
 // 資料搜尋-站點關鍵字
 const dataSearched = computed(() =>
   keywordsSearch.value === ''
-    ? dataArray.value
-    : dataArray.value.filter((data) => data.ar.includes(keywordsSearch.value))
+    ? dataSorted.value
+    : dataSorted.value.filter((data) => data.ar.includes(keywordsSearch.value))
 )
 // 資料切頁-一次10筆
 const data10x = computed(() => {
-  return dataSorted.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
+  return dataSearched.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
 })
 // 資料排序-響應物件
 const ref_sortToggle = ref({
   sortField: '', // 排序的欄位
   order: 0 // -1: desc，1: asc
 })
-// 資料排序-總車位數量
-function sortToggle_total() {
-  if (ref_sortToggle.value.sortField != 'total') {
-    ref_sortToggle.value.sortField = 'total'
+// 資料排序-按鈕切換
+function sortToggle(fieldName) {
+  if (ref_sortToggle.value.sortField !== fieldName) {
+    ref_sortToggle.value.sortField = fieldName
     ref_sortToggle.value.order = -1 // 初始為desc
   } else {
     ref_sortToggle.value.order = ref_sortToggle.value.order * -1
   }
 }
-// 資料排序-可租借的腳踏車數量
-function sortToggle_bikes() {
-  if (ref_sortToggle.value.sortField != 'bike') {
-    ref_sortToggle.value.sortField = 'bike'
-    ref_sortToggle.value.order = -1 // 初始為desc
-  } else {
-    ref_sortToggle.value.order = ref_sortToggle.value.order * -1
-  }
-}
+
 // 資料排序-computed()
 const dataSorted = computed(() => {
   if (ref_sortToggle.value.sortField === 'total')
     return ref_sortToggle.value.order > 0
-      ? dataSearched.value.sort((a, b) => a.total - b.total)
-      : dataSearched.value.sort((a, b) => b.total - a.total)
+      ? dataArray.value.sort((a, b) => a.total - b.total)
+      : dataArray.value.sort((a, b) => b.total - a.total)
   if (ref_sortToggle.value.sortField === 'bike')
     return ref_sortToggle.value.order > 0
-      ? dataSearched.value.sort((a, b) => a.available_return_bikes - b.available_return_bikes)
-      : dataSearched.value.sort((a, b) => b.available_return_bikes - a.available_return_bikes)
-  return dataSearched.value
+      ? dataArray.value.sort((a, b) => a.available_return_bikes - b.available_return_bikes)
+      : dataArray.value.sort((a, b) => b.available_return_bikes - a.available_return_bikes)
+  return dataArray.value
 })
 
 // Pages ----------
@@ -101,8 +93,8 @@ function btnPageJump(page) {
             <th>站點名稱</th>
             <th>站點所在區域</th>
             <th>站點地址</th>
-            <th>總車位數量<button @click="sortToggle_total">S</button></th>
-            <th>可租借的腳踏車數量<button @click="sortToggle_bikes">S</button></th>
+            <th>總車位數量<button @click="sortToggle('total')">S</button></th>
+            <th>可租借的腳踏車數量<button @click="sortToggle('bike')">S</button></th>
             <th>站點緯度</th>
             <th>站點經度</th>
             <th>可歸還的腳踏車數量</th>
