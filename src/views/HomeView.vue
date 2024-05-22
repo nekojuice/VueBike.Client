@@ -68,6 +68,10 @@ function btnPageNext() {
 function btnPageJump(page) {
   pageCurrent.value = page - 1 // page值用於顯示，會多1
 }
+// 搜尋時回第一頁
+function firstPageOnSearch() {
+  btnPageJump(1)
+}
 
 // 頁面切換按鈕
 const visiblePages = computed(() => {
@@ -95,7 +99,7 @@ const visiblePages = computed(() => {
       <div>
         <button class="btn btn-primary">查詢</button>
         &nbsp;
-        <input type="text" class="" v-model="keywordsSearch" />
+        <input type="text" class="" v-model="keywordsSearch" @input="firstPageOnSearch" />
       </div>
       <table class="table">
         <thead>
@@ -114,7 +118,7 @@ const visiblePages = computed(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="data in data10x" v-bind:key="data.sno">
+          <tr v-for="data in data10x" :key="data.sno">
             <td>{{ data.sno }}</td>
             <td>{{ data.sna }}</td>
             <td>{{ data.sarea }}</td>
@@ -134,7 +138,7 @@ const visiblePages = computed(() => {
         class="btn btn-outline-primary"
         @click="btnPageJump(n)"
         v-for="n in visiblePages"
-        v-bind:key="n"
+        :key="n"
       >
         {{ n }}</button
       ><button class="btn btn-outline-primary" @click="btnPageNext">下一頁</button>
