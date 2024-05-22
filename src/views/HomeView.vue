@@ -19,9 +19,7 @@ const dataArray = ref([])
 const keywordsSearch = ref('')
 // 資料搜尋-站點關鍵字
 const dataSearched = computed(() =>
-  keywordsSearch.value === ''
-    ? dataSorted.value
-    : dataSorted.value.filter((data) => data.ar.includes(keywordsSearch.value))
+  dataSorted.value.filter((data) => data.ar.includes(keywordsSearch.value))
 )
 // 資料切頁-一次10筆
 const data10x = computed(() => {
@@ -38,24 +36,17 @@ function sortToggle(fieldName) {
     ref_sortToggle.value.sortField = fieldName
     ref_sortToggle.value.order = -1 // 初始為desc
   } else {
-    ref_sortToggle.value.order = ref_sortToggle.value.order * -1
+    ref_sortToggle.value.order *= -1 // 倒轉
   }
 }
 // 資料排序-computed()
 const dataSorted = computed(() => {
-  if (ref_sortToggle.value.sortField === 'total')
-    return ref_sortToggle.value.order > 0
-      ? dataArray.value.sort((a, b) => a.total - b.total)
-      : dataArray.value.sort((a, b) => b.total - a.total)
-  if (ref_sortToggle.value.sortField === 'bike')
-    return ref_sortToggle.value.order > 0
-      ? dataArray.value.sort((a, b) => a.available_return_bikes - b.available_return_bikes)
-      : dataArray.value.sort((a, b) => b.available_return_bikes - a.available_return_bikes)
-  return dataArray.value
+  let { sortField, order } = ref_sortToggle.value // 解構後失去ref，純計算應不影響
+  return dataArray.value.sort((a, b) => (a[sortField] - b[sortField]) * order)
 })
 
 //--------------------
-// Pagination -------------
+// Pagination --------
 // 當前頁面
 const pageCurrent = ref(0)
 // 最大頁面
@@ -114,7 +105,9 @@ const visiblePages = computed(() => {
             <th>站點所在區域</th>
             <th>站點地址</th>
             <th>總車位數量<button @click="sortToggle('total')">S</button></th>
-            <th>可租借的腳踏車數量<button @click="sortToggle('bike')">S</button></th>
+            <th>
+              可租借的腳踏車數量<button @click="sortToggle('available_return_bikes')">S</button>
+            </th>
             <th>站點緯度</th>
             <th>站點經度</th>
             <th>可歸還的腳踏車數量</th>
