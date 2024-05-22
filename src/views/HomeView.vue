@@ -21,6 +21,13 @@ const keywordsSearch = ref('')
 const dataSearched = computed(() =>
   dataSorted.value.filter((data) => data.ar.includes(keywordsSearch.value))
 )
+// 資料搜尋-關鍵字紅色醒目
+function RedKeyword(origin) {
+  if (!keywordsSearch.value) return origin
+  const keyword = new RegExp(`(${keywordsSearch.value})`, 'gi') //g=全域, i=不分大小寫
+  return origin.replace(keyword, '<span style="color: red">$1</span>')
+}
+
 // 資料切頁-一次10筆
 const data10x = computed(() => {
   return dataSearched.value.slice(pageCurrent.value * 10, pageCurrent.value * 10 + 10)
@@ -122,7 +129,7 @@ const visiblePages = computed(() => {
             <td>{{ data.sno }}</td>
             <td>{{ data.sna }}</td>
             <td>{{ data.sarea }}</td>
-            <td>{{ data.ar }}</td>
+            <td v-html="RedKeyword(data.ar.toString())"></td>
             <td>{{ data.total }}</td>
             <td>{{ data.available_return_bikes }}</td>
             <td>{{ data.latitude }}</td>
