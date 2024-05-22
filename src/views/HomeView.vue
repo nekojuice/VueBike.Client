@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/no-side-effects-in-computed-properties -->
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import searchBar from '../components/SearchBar.vue'
 
 // 資料  ----------
 onMounted(async () => {
@@ -87,9 +88,7 @@ function btnPageJump(page) {
   pageCurrent.value = page - 1 // page值用於顯示，會多1
 }
 // 搜尋時回第一頁
-function firstPageOnSearch() {
-  btnPageJump(1)
-}
+watch(keywordsSearch, () => btnPageJump(1))
 
 // 頁面切換按鈕
 const visiblePages = computed(() => {
@@ -122,16 +121,8 @@ function getButtonClass(page) {
     <div class="container-fluid">
       <nav class="d-flex m-3">
         <span class="me-auto d-flex align-items-center fs-3 fw-bold">YouBike 站點查詢</span>
-        <div class="">
-          <input
-            type="text"
-            class="bg-light border border-secondary rounded-3 h-100 p-2"
-            v-model="keywordsSearch"
-            @input="firstPageOnSearch"
-            placeholder="搜尋站點地址"
-          />
-          <button class="btn btn-primary ms-2 h-100">查詢</button>
-        </div>
+        <!-- 搜尋組件 -->
+        <searchBar v-model="keywordsSearch" />
       </nav>
       <hr />
       <table class="table table-striped table-hover table-fixed align-middle text-center mb-5">
