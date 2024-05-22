@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-side-effects-in-computed-properties -->
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 // 資料  ----------
 onMounted(async () => {
@@ -98,6 +98,10 @@ const visiblePages = computed(() => {
   }
   return pages
 })
+// 當前頁面按鈕class顏色標記
+function getButtonClass(page) {
+  return page === pageCurrent.value + 1 ? 'btn btn-primary' : 'btn btn-outline-primary'
+}
 </script>
 
 <template>
@@ -142,7 +146,7 @@ const visiblePages = computed(() => {
     <div>
       <button class="btn btn-outline-primary" @click="btnPagePrev">上一頁</button
       ><button
-        class="btn btn-outline-primary"
+        :class="getButtonClass(n)"
         @click="btnPageJump(n)"
         v-for="n in visiblePages"
         :key="n"
