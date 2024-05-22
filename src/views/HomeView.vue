@@ -49,13 +49,13 @@ function sortToggle(fieldName) {
 }
 // 資料排序-按鈕圖示變換
 function changeToggleIcon(fieldName) {
+  let up = ''
+  let down = ''
   if (ref_sortToggle.value.sortField == fieldName) {
-    if (ref_sortToggle.value.order == -1)
-      return '<i class="bi bi-caret-up"></i><br /><i class="bi bi-caret-down-fill"></i>'
-    if (ref_sortToggle.value.order == 1)
-      return '<i class="bi bi-caret-up-fill"></i><br /><i class="bi bi-caret-down"></i>'
+    if (ref_sortToggle.value.order == -1) up = '-fill'
+    if (ref_sortToggle.value.order == 1) down = '-fill'
   }
-  return '<i class="bi bi-caret-up"></i><br /><i class="bi bi-caret-down"></i>'
+  return `<i class="bi bi-caret-up${up}"></i><br /><i class="bi bi-caret-down${down}"></i>`
 }
 
 // 資料排序-computed()
