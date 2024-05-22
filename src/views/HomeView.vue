@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-side-effects-in-computed-properties -->
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 // 資料  ----------
 onMounted(async () => {
@@ -37,7 +37,7 @@ const ref_sortToggle = ref({
   sortField: '', // 排序的欄位
   order: 0 // -1: desc，1: asc
 })
-// 資料排序-按鈕切換
+// 資料排序-排序資料
 function sortToggle(fieldName) {
   if (ref_sortToggle.value.sortField !== fieldName) {
     ref_sortToggle.value.sortField = fieldName
@@ -46,6 +46,17 @@ function sortToggle(fieldName) {
     ref_sortToggle.value.order *= -1 // 倒轉
   }
 }
+// 資料排序-按鈕圖示變換
+function changeToggleIcon(fieldName) {
+  if (ref_sortToggle.value.sortField == fieldName) {
+    if (ref_sortToggle.value.order == -1)
+      return '<i class="bi bi-caret-up"></i><br /><i class="bi bi-caret-down-fill"></i>'
+    if (ref_sortToggle.value.order == 1)
+      return '<i class="bi bi-caret-up-fill"></i><br /><i class="bi bi-caret-down"></i>'
+  }
+  return '<i class="bi bi-caret-up"></i><br /><i class="bi bi-caret-down"></i>'
+}
+
 // 資料排序-computed()
 const dataSorted = computed(() => {
   let { sortField, order } = ref_sortToggle.value // 解構後失去ref，純計算應不影響
@@ -100,32 +111,61 @@ const visiblePages = computed(() => {
 })
 // 當前頁面按鈕class顏色標記
 function getButtonClass(page) {
-  return page === pageCurrent.value + 1 ? 'btn btn-primary' : 'btn btn-outline-primary'
+  return page === pageCurrent.value + 1
+    ? 'btn btn-primary rounded-0'
+    : 'btn btn-outline-primary rounded-0'
 }
 </script>
 
 <template>
   <main>
-    <div class="container">
-      <div>
-        <button class="btn btn-primary">查詢</button>
-        &nbsp;
-        <input type="text" class="" v-model="keywordsSearch" @input="firstPageOnSearch" />
-      </div>
-      <table class="table">
-        <thead>
+    <div class="container-fluid">
+      <nav class="d-flex m-3">
+        <span class="me-auto d-flex align-items-center fs-3 fw-bold">YouBike 站點查詢</span>
+        <div class="">
+          <input
+            type="text"
+            class="bg-light border border-secondary rounded-3 h-100 p-2"
+            v-model="keywordsSearch"
+            @input="firstPageOnSearch"
+            placeholder="搜尋站點地址"
+          />
+          <button class="btn btn-primary ms-2 h-100">查詢</button>
+        </div>
+      </nav>
+      <hr />
+      <table class="table table-striped table-hover table-fixed align-middle text-center mb-5">
+        <thead class="table-primary align-middle">
           <tr>
-            <th>站點編號</th>
-            <th>站點名稱</th>
-            <th>站點所在區域</th>
-            <th>站點地址</th>
-            <th>總車位數量<button @click="sortToggle('total')">S</button></th>
-            <th>
-              可租借的腳踏車數量<button @click="sortToggle('available_return_bikes')">S</button>
+            <th class="p-2">站點編號</th>
+            <th class="p-2">站點名稱</th>
+            <th class="p-2">站點所在區域</th>
+            <th class="p-2">站點地址</th>
+            <th class="p-2">
+              <div class="d-flex align-items-center justify-center">
+                <span class="me-1">總車位數量</span>
+                <span
+                  class="hasCursor"
+                  @click="sortToggle('total')"
+                  v-html="changeToggleIcon('total')"
+                >
+                </span>
+              </div>
             </th>
-            <th>站點緯度</th>
-            <th>站點經度</th>
-            <th>可歸還的腳踏車數量</th>
+            <th class="p-2">
+              <div class="d-flex align-items-center justify-center">
+                <span class="me-1">可租借的腳踏車數量</span>
+                <span
+                  class="hasCursor"
+                  @click="sortToggle('available_return_bikes')"
+                  v-html="changeToggleIcon('available_return_bikes')"
+                >
+                </span>
+              </div>
+            </th>
+            <th class="p-2">站點緯度</th>
+            <th class="p-2">站點經度</th>
+            <th class="p-2">可歸還的腳踏車數量</th>
           </tr>
         </thead>
         <tbody>
@@ -142,18 +182,28 @@ function getButtonClass(page) {
           </tr>
         </tbody>
       </table>
-    </div>
-    <div>
-      <button class="btn btn-outline-primary" @click="btnPagePrev">上一頁</button
-      ><button
-        :class="getButtonClass(n)"
-        @click="btnPageJump(n)"
-        v-for="n in visiblePages"
-        :key="n"
+      <div
+        class="bg-light d-flex justify-content-center position-fixed bottom-0 start-50 translate-middle-x"
       >
-        {{ n }}</button
-      ><button class="btn btn-outline-primary" @click="btnPageNext">下一頁</button>
+        <button class="btn btn-outline-primary rounded-end-0" @click="btnPagePrev">上一頁</button
+        ><button
+          :class="getButtonClass(n)"
+          @click="btnPageJump(n)"
+          v-for="n in visiblePages"
+          :key="n"
+        >
+          {{ n }}</button
+        ><button class="btn btn-outline-primary rounded-start-0" @click="btnPageNext">
+          下一頁
+        </button>
+        <!-- <div class="d-flex justify-content-center">{{ pageCurrent + 1 }} / {{ pageMax }}</div> -->
+      </div>
     </div>
-    <div>{{ pageCurrent + 1 }} / {{ pageMax }}</div>
   </main>
 </template>
+
+<style scoped>
+.hasCursor {
+  cursor: pointer;
+}
+</style>
